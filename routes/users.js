@@ -7,7 +7,7 @@ const router   = express.Router();
 
 // User Login Route
 router.get("/login", (request,response) =>{
-    response.send("login");
+    response.render("users/login");
 });
 router.get("/register", (request,response) =>{
     response.send("register");
