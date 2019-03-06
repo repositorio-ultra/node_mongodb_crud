@@ -1,8 +1,10 @@
-const express = require("express");
-const exphbs  = require("express-handlebars");
+const express        = require("express");
+const exphbs         = require("express-handlebars");
 const methodOverride = require('method-override');
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
+const flash          = require('connect-flash');
+const session        = require('express-session');
+const mongoose       = require("mongoose");
+const bodyParser     = require("body-parser");
 
 const app = express();
 
@@ -35,6 +37,24 @@ app.use(bodyParser.json());
 
 // Method override for PUT
 app.use(methodOverride('_method'));
+
+// Middleware for session
+app.use(session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true
+  }));
+
+// Flash
+app.use(flash());
+
+// Global variables
+app.use(function(request,response, next){
+    response.locals.success_msg = request.flash("success_msg");
+    response.locals.error_msg = request.flash("error_msg");
+    response.locals.error = request.flash("error");
+    next();
+});
 
 // Index Route
 
@@ -111,6 +131,7 @@ app.post("/ideas",(request,response,next)=>{
        .save()
        .then(
            idea =>{
+               request.flash("success_msg", "Video idea added..");
                response.redirect("/ideas");
            }
        )
@@ -129,6 +150,7 @@ app.put("/ideas/:id", (request, response)=>{
         idea.details = request.body.details;
         idea.save()
         .then( idea => {
+            request.flash("success_msg", "Video idea updated..");
             response.redirect("/ideas");
         });
     });
@@ -136,13 +158,12 @@ app.put("/ideas/:id", (request, response)=>{
 
 // Delete form process
 app.delete("/ideas/:id", (request, response)=>{
-    Idea.remove({
+    Idea.deleteOne({
         _id: request.params.id
     })
     .then( () => {
-
-            response.redirect("/ideas");
-
+        request.flash("success_msg", "Video idea removed...");
+        response.redirect("/ideas");
     });
 });
 
