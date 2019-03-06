@@ -3,20 +3,9 @@ const exphbs         = require("express-handlebars");
 const methodOverride = require('method-override');
 const flash          = require('connect-flash');
 const session        = require('express-session');
-const mongoose       = require("mongoose");
 const bodyParser     = require("body-parser");
 
 const app = express();
-
-// Connect to mongoose
-mongoose.connect("mongodb://localhost/vidjot-dev",{ useNewUrlParser: true })
-.then(()=>{ console.log("MongoDB connected")})
-.catch(err => {console.log(err)});
-
-// Load Idea Model
-require("./models/Idea");
-const Idea = mongoose.model("ideas");
-
 
 // How middleware works
 // app.use(function(request,response, next){
@@ -35,7 +24,7 @@ app.set("view engine", "handlebars");
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
 
-// Method override for PUT
+// Method override for PUT, DELETE
 app.use(methodOverride('_method'));
 
 // Middleware for session
@@ -67,105 +56,14 @@ app.get("/", (request, response)=>{
 app.get("/about", (request,response)=>{
     response.render("about"); 
 });
-app.get("/ideas", (request,response)=>{
-    Idea.find({})
-    .sort({date: "descending"} )
-    .then( ideas =>{
-        response.render("ideas/index",{
-            ideas : ideas
-        });
-    });
-    
-});
 
-app.get("/ideas/edit/:id", (request,response)=>{
-    Idea.findOne({
-        _id: request.params.id
-    })
-    .then( ideas =>{
-        console.log(ideas);
-        response.render("ideas/edit",{ 
-            idea: ideas
-        });
+// Load Routes
+const ideas = require("./routes/ideas");
+const users = require("./routes/users");
 
-    });
-});
-
-app.get("/ideas/add", (request,response)=>{
-    response.render("ideas/add");
-});
-
-app.post("/ideas",(request,response,next)=>{
-    console.log(request.body);
-    let error = [];
-    if (! request.body.title )
-    {
-        console.log("sem título");
-        error.push({text: "Please add a title" });
-    }
-    if (! request.body.details)
-    {
-        console.log("sem detalhes");
-        error.push({text: "Please add details" });
-        console.log(error.length);
-    }
-
-    if (error.length > 0)
-    {
-        response.render("ideas/add", {
-
-            errors : error,
-            title: request.body.title,
-            details: request.body.details            
-        });
-    }
-    else
-    {
-       const newUser = {
-           title: request.body.title,
-           details: request.body.details
-
-       }
-       //New idea é da model, criada no topo da página
-       new Idea(newUser) 
-       .save()
-       .then(
-           idea =>{
-               request.flash("success_msg", "Video idea added..");
-               response.redirect("/ideas");
-           }
-       )
-    }
-
-});
-
-// Edit form process
-app.put("/ideas/:id", (request, response)=>{
-    Idea.findOne({
-        _id: request.params.id
-    })
-    .then( idea => {
-        // new values
-        idea.title = request.body.title;
-        idea.details = request.body.details;
-        idea.save()
-        .then( idea => {
-            request.flash("success_msg", "Video idea updated..");
-            response.redirect("/ideas");
-        });
-    });
-});
-
-// Delete form process
-app.delete("/ideas/:id", (request, response)=>{
-    Idea.deleteOne({
-        _id: request.params.id
-    })
-    .then( () => {
-        request.flash("success_msg", "Video idea removed...");
-        response.redirect("/ideas");
-    });
-});
+// Use Routes
+app.use("/ideas", ideas);
+app.use("/users", users);
 
 const port = 5000;
 
