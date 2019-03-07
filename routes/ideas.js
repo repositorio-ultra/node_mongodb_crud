@@ -33,7 +33,7 @@ router.get("/edit/:id",ensureAuthenticated, (request,response)=>{
     })
     .then( ideas =>{
         //console.log(ideas);
-        if(idea.user != request.user.id)
+        if(ideas.user != request.user.id)
         {
             request.flash("error_msg", "Not Authorized");
             request.redirect("/ideas");
