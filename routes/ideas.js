@@ -2,7 +2,7 @@ const express         = require("express");
 const mongoose        = require("mongoose");
 const router          = express.Router();
 
-//Tudo que vem nesta router tem como prefixo na url /ideas
+//Tudo que vem nesta router tem como prefixo na url /ideas, portanto ele deve ser removido neste arquivo
 
 // Connect to mongoose
 mongoose.connect("mongodb://localhost/vidjot-dev",{ useNewUrlParser: true })
@@ -42,7 +42,7 @@ router.get("/add", (request,response)=>{
     response.render("ideas/add");
 });
 
-router.post("/ideas",(request,response,next)=>{
+router.post("/",(request,response,next)=>{
     console.log(request.body);
     let error = [];
     if (! request.body.title )
