@@ -42,7 +42,7 @@ router.get("/add", (request,response)=>{
     response.render("ideas/add");
 });
 
-router.post("/ideas",(request,response,next)=>{
+router.post("/",(request,response,next)=>{
     console.log(request.body);
     let error = [];
     if (! request.body.title )
