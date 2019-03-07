@@ -12,7 +12,7 @@ const app = express();
 // app.use(function(request,response, next){
 //     console.log(Date.now());
 //     request.nome = "Ricardo ";
-//     next();
+//     next(); 
 // });
 
 // Handlebars Middeware
@@ -27,6 +27,7 @@ app.use(bodyParser.json());
 
 // Static Folder
 app.use(express.static(path.join(__dirname,"public")));
+console.log((path.join(__dirname,"public")));
 
 // Method override for PUT, DELETE
 app.use(methodOverride('_method'));
