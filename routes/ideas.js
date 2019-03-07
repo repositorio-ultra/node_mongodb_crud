@@ -1,8 +1,10 @@
 const express         = require("express");
 const mongoose        = require("mongoose");
 const router          = express.Router();
+const {ensureAuthenticated} = require("../helpers/auth"); // o curly é para facilitar as chamadas das funções de dentro do objeto
 
-//Tudo que vem nesta router tem como prefixo na url /ideas
+
+//Tudo que vem nesta router tem como prefixo na url /ideas, portanto ele deve ser removido neste arquivo
 
 // Connect to mongoose
 mongoose.connect("mongodb://localhost/vidjot-dev",{ useNewUrlParser: true })
@@ -13,8 +15,8 @@ mongoose.connect("mongodb://localhost/vidjot-dev",{ useNewUrlParser: true })
 require("../models/Idea");
 const Idea = mongoose.model("ideas");
 
-router.get("/", (request,response)=>{
-    Idea.find({})
+router.get("/",ensureAuthenticated, (request,response)=>{
+    Idea.find({user: request.user.id})
     .sort({date: "descending"} )
     .then( ideas =>{
         response.render("ideas/index",{
@@ -25,24 +27,31 @@ router.get("/", (request,response)=>{
 });
 
 
-router.get("/edit/:id", (request,response)=>{
+router.get("/edit/:id",ensureAuthenticated, (request,response)=>{
     Idea.findOne({
         _id: request.params.id
     })
     .then( ideas =>{
-        console.log(ideas);
-        response.render("ideas/edit",{ 
-            idea: ideas
-        });
-
+        //console.log(ideas);
+        if(ideas.user != request.user.id)
+        {
+            request.flash("error_msg", "Not Authorized");
+            request.redirect("/ideas");
+        }
+        else
+        {
+            response.render("ideas/edit",{ 
+                idea: ideas
+            });
+        }
     });
 });
 
-router.get("/add", (request,response)=>{
+router.get("/add", ensureAuthenticated, (request,response)=>{
     response.render("ideas/add");
 });
 
-router.post("/",(request,response,next)=>{
+router.post("/",ensureAuthenticated,(request,response,next)=>{
     console.log(request.body);
     let error = [];
     if (! request.body.title )
@@ -70,8 +79,8 @@ router.post("/",(request,response,next)=>{
     {
        const newUser = {
            title: request.body.title,
-           details: request.body.details
-
+           details: request.body.details,
+           user: request.user.id
        }
        //New idea é da model, criada no topo da página
        new Idea(newUser) 
@@ -87,7 +96,7 @@ router.post("/",(request,response,next)=>{
 });
 
 // Edit form process
-router.put("/:id", (request, response)=>{
+router.put("/:id",ensureAuthenticated, (request, response)=>{
     Idea.findOne({
         _id: request.params.id
     })
@@ -104,7 +113,7 @@ router.put("/:id", (request, response)=>{
 });
 
 // Delete form process
-router.delete("/:id", (request, response)=>{
+router.delete("/:id",ensureAuthenticated, (request, response)=>{
     Idea.deleteOne({
         _id: request.params.id
     })
