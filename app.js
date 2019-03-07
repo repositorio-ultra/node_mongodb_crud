@@ -5,6 +5,7 @@ const flash          = require('connect-flash');
 const session        = require('express-session');
 const bodyParser     = require("body-parser");
 const path           = require("path");
+const passport       = require("passport");
 
 const app = express();
 
@@ -39,14 +40,19 @@ app.use(session({
     saveUninitialized: true
   }));
 
+// Passport Middleware for user session authentication
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Flash
 app.use(flash());
 
 // Global variables
 app.use(function(request,response, next){
     response.locals.success_msg = request.flash("success_msg");
-    response.locals.error_msg = request.flash("error_msg");
-    response.locals.error = request.flash("error");
+    response.locals.error_msg   = request.flash("error_msg");
+    response.locals.error       = request.flash("error");
+    response.locals.user        = request.user || null; // Só não vai ser null se estiver logado via passport
     next();
 });
 
@@ -69,6 +75,9 @@ const users = require("./routes/users");
 // Use Routes
 app.use("/ideas", ideas);
 app.use("/users", users);
+
+// Passport Config
+require("./config/passport")(passport);
 
 const port = 5000;
 

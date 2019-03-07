@@ -17,6 +17,15 @@ router.get("/register", (request,response) =>{
     response.render("users/register");
 });
 
+// Login Form POST
+router.post("/login", (request, response, next)=>{
+    passport.authenticate("local",{
+        successRedirect: "/ideas",
+        failureRedirect: "/users/login",
+        failureFlash: true
+    })(request,response, next);
+});
+
 // Register Form post
 router.post("/register", (request,response) =>{
     console.log(request.body);
@@ -75,6 +84,7 @@ router.post("/register", (request,response) =>{
         })
     }
 });
+
 
 
 module.exports = router;
