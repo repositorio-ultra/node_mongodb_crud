@@ -57,8 +57,11 @@ app.use(function(request,response, next){
     next();
 });
 
+// DB Config
+const db = require('./config/database');
+
 // Connect to mongoose
-mongoose.connect("mongodb://localhost/vidjot-dev",{ useNewUrlParser: true })
+mongoose.connect(db.mongoURI,{ useNewUrlParser: true })
 .then(()=>{ console.log("MongoDB connected")})
 .catch(err => {console.log(err)});
 
