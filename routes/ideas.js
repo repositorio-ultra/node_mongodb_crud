@@ -1,15 +1,10 @@
 const express         = require("express");
-const mongoose        = require("mongoose");
 const router          = express.Router();
+const mongoose        = require("mongoose");
 const {ensureAuthenticated} = require("../helpers/auth"); // o curly é para facilitar as chamadas das funções de dentro do objeto
 
 
 //Tudo que vem nesta router tem como prefixo na url /ideas, portanto ele deve ser removido neste arquivo
-
-// Connect to mongoose
-mongoose.connect("mongodb://localhost/vidjot-dev",{ useNewUrlParser: true })
-.then(()=>{ console.log("MongoDB connected")})
-.catch(err => {console.log(err)});
 
 // Load Idea Model
 require("../models/Idea");
