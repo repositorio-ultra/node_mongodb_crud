@@ -6,6 +6,7 @@ const session        = require('express-session');
 const bodyParser     = require("body-parser");
 const path           = require("path");
 const passport       = require("passport");
+const mongoose        = require("mongoose");
 
 const app = express();
 
@@ -56,6 +57,14 @@ app.use(function(request,response, next){
     next();
 });
 
+// DB Config
+const db = require('./config/database');
+
+// Connect to mongoose
+mongoose.connect(db.mongoURI,{ useNewUrlParser: true })
+.then(()=>{ console.log("MongoDB connected")})
+.catch(err => {console.log(err)});
+
 // Index Route
 
 app.get("/", (request, response)=>{
@@ -79,7 +88,7 @@ app.use("/users", users);
 // Passport Config
 require("./config/passport")(passport);
 
-const port = 5000;
+const port = process.env.PORT || 5000; // Necessário para o deploy
 
 app.listen(port, ()=>{
     console.log(`Server started on port ${port}`);
