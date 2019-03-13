@@ -68,7 +68,7 @@ mongoose.connect(db.mongoURI,{ useNewUrlParser: true })
 // Index Route
 
 app.get("/", (request, response)=>{
-    const title = "Welcome 1";
+    const title = "Welcome 2";
     response.render("index",{title: title});
 
 });
