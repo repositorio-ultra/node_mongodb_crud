@@ -68,7 +68,7 @@ mongoose.connect(db.mongoURI,{ useNewUrlParser: true })
 // Index Route
 
 app.get("/", (request, response)=>{
-    const title = "Welcome 1";
+    const title = "Welcome 2";
     response.render("index",{title: title});
 
 });
@@ -80,6 +80,7 @@ app.get("/about", (request,response)=>{
 // Load Routes
 const ideas = require("./routes/ideas");
 const users = require("./routes/users");
+// descascar
 
 // Use Routes
 app.use("/ideas", ideas);
